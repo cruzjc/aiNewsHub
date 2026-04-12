@@ -117,6 +117,28 @@ The Pi maintainer may only make small safe changes, commit them to `maintainer/p
 
 If no remote exists yet, the Pi bootstrap can still copy a maintenance checkout, but reconcile, branch push, and PR creation remain blocked until `origin` points to a real repository.
 
+## OpenAI secret setup
+
+The deployed ingest worker reads `OPENAI_SECRET_ARN` from AWS Secrets Manager. The current secret resource is named `ai-news-hub/openai-api-key`.
+
+To set or rotate the production key:
+
+```bash
+aws secretsmanager put-secret-value \
+  --secret-id ai-news-hub/openai-api-key \
+  --secret-string 'sk-your-real-openai-key'
+```
+
+You can also store JSON if you prefer:
+
+```bash
+aws secretsmanager put-secret-value \
+  --secret-id ai-news-hub/openai-api-key \
+  --secret-string '{"OPENAI_API_KEY":"sk-your-real-openai-key"}'
+```
+
+The worker falls back to non-OpenAI summaries when no valid key is available.
+
 ## Maintainer notes
 
 - read [PROJECT_SPEC.md](/mnt/e/Projects/aiNewsHub/PROJECT_SPEC.md), [AGENT_RULES.md](/mnt/e/Projects/aiNewsHub/AGENT_RULES.md), [RUNNER_CONTRACT.md](/mnt/e/Projects/aiNewsHub/RUNNER_CONTRACT.md), and [config/maintenance.json](/mnt/e/Projects/aiNewsHub/config/maintenance.json) first

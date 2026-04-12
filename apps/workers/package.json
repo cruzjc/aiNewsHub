@@ -11,6 +11,7 @@
     "test": "vitest run src/pipeline.test.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.922.0",
     "@ainewshub/schema": "workspace:*",
     "fast-xml-parser": "^5.2.5",
     "openai": "^5.20.2"

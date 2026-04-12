@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
+import { GetSecretValueCommand, SecretsManagerClient } from "@aws-sdk/client-secrets-manager";
 import OpenAI from "openai";
 import { XMLParser } from "fast-xml-parser";
 
@@ -15,6 +16,8 @@ const parser = new XMLParser({
   ignoreAttributes: false,
   attributeNamePrefix: "",
 });
+const secretsClient = new SecretsManagerClient({});
+let cachedResolvedApiKey: string | null | undefined;
 
 export type ArticleCandidate = Omit<Article, "id" | "rankScore" | "confidenceScore" | "enrichmentStatus"> & {
   excerpt?: string;
@@ -137,8 +140,70 @@ const fallbackSummary = (candidate: ArticleCandidate) => {
   };
 };
 
+export const parseOpenAiSecretString = (secretValue: string): string | null => {
+  const trimmed = secretValue.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(trimmed) as unknown;
+    if (typeof parsed === "string" && parsed.trim()) {
+      return parsed.trim();
+    }
+    if (parsed && typeof parsed === "object") {
+      for (const key of ["OPENAI_API_KEY", "apiKey", "openaiApiKey"]) {
+        const value = (parsed as Record<string, unknown>)[key];
+        if (typeof value === "string" && value.trim()) {
+          return value.trim();
+        }
+      }
+    }
+  } catch {
+    return trimmed;
+  }
+
+  return null;
+};
+
+const resolveOpenAiApiKey = async (): Promise<string | null> => {
+  const directApiKey = process.env.OPENAI_API_KEY?.trim();
+  if (directApiKey) {
+    return directApiKey;
+  }
+
+  if (cachedResolvedApiKey !== undefined) {
+    return cachedResolvedApiKey;
+  }
+
+  const secretArn = process.env.OPENAI_SECRET_ARN?.trim();
+  if (!secretArn) {
+    cachedResolvedApiKey = null;
+    return cachedResolvedApiKey;
+  }
+
+  try {
+    const response = await secretsClient.send(
+      new GetSecretValueCommand({
+        SecretId: secretArn,
+      }),
+    );
+
+    const secretPayload =
+      response.SecretString ??
+      (response.SecretBinary ? Buffer.from(response.SecretBinary).toString("utf-8") : "");
+
+    cachedResolvedApiKey = secretPayload ? parseOpenAiSecretString(secretPayload) : null;
+    return cachedResolvedApiKey;
+  } catch (error) {
+    console.error("failed to load OpenAI API key from Secrets Manager", error);
+    cachedResolvedApiKey = null;
+    return cachedResolvedApiKey;
+  }
+};
+
 const enrichWithOpenAI = async (candidate: ArticleCandidate): Promise<Pick<Article, "summary" | "whyItMatters" | "tags" | "entities" | "confidenceScore" | "rankScore" | "enrichmentStatus">> => {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = await resolveOpenAiApiKey();
   if (!apiKey) {
     return fallbackSummary(candidate);
   }

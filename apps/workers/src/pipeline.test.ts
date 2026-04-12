@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { ArticleCandidate } from "./pipeline.js";
-import { dedupeCandidates, enrichCandidate, normalizeFeed } from "./pipeline.js";
+import { dedupeCandidates, enrichCandidate, normalizeFeed, parseOpenAiSecretString } from "./pipeline.js";
 import { loadSourceRegistry } from "./source-registry.js";
 
 describe("worker pipeline", () => {
@@ -79,5 +79,13 @@ describe("worker pipeline", () => {
     };
     const article = await enrichCandidate(candidate);
     expect(article.enrichmentStatus).toBe("fallback");
+  });
+
+  it("parses a raw secret string", () => {
+    expect(parseOpenAiSecretString("sk-test-123")).toBe("sk-test-123");
+  });
+
+  it("parses a json secret payload", () => {
+    expect(parseOpenAiSecretString(JSON.stringify({ OPENAI_API_KEY: "sk-json-123" }))).toBe("sk-json-123");
   });
 });
