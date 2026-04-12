@@ -39,7 +39,7 @@ rsync -az --delete \
   "${SSH_TARGET}:$REMOTE_PATH/"
 
 ssh -o StrictHostKeyChecking=accept-new "$SSH_TARGET" "if ! git -C \"$REMOTE_PATH\" remote get-url origin >/dev/null 2>&1; then rm -rf \"$REMOTE_BARE_PATH\" && git clone --bare \"$REMOTE_PATH\" \"$REMOTE_BARE_PATH\" && git -C \"$REMOTE_PATH\" remote add origin \"$REMOTE_BARE_PATH\"; fi"
-ssh -o StrictHostKeyChecking=accept-new "$SSH_TARGET" "cd \"$REMOTE_PATH\" && python3 scripts/validate.py || true"
+ssh -o StrictHostKeyChecking=accept-new "$SSH_TARGET" "cd \"$REMOTE_PATH\" && corepack pnpm install && python3 scripts/validate.py"
 echo "Copied repository to $TARGET:$REMOTE_PATH"
 echo "A local bare origin was created at $REMOTE_BARE_PATH when no remote existed."
-echo "Install cron on the Pi after pnpm and maintainer environment variables are configured."
+echo "Install cron on the Pi after maintainer environment variables are configured."
