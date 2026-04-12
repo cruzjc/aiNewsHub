@@ -1,6 +1,6 @@
 # Repo map
 
-_Generated: 2026-04-12T11:22:12.111217+00:00_
+_Generated: 2026-04-12T13:15:03.791737+00:00_
 
 ## Top-level directories
 - `.agent/`
@@ -61,7 +61,7 @@ _Generated: 2026-04-12T11:22:12.111217+00:00_
 - `reconciler/runner.py`: 8 functions, 0 classes, 11 imports
 - `scripts/collect_logs.py`: 0 functions, 0 classes, 4 imports
 - `scripts/invoke_agent.py`: 1 functions, 0 classes, 5 imports
-- `scripts/pi_maintainer_agent.py`: 8 functions, 0 classes, 11 imports
+- `scripts/pi_maintainer_agent.py`: 9 functions, 0 classes, 11 imports
 - `scripts/run_maintenance.py`: 0 functions, 0 classes, 3 imports
 - `scripts/update_repo_map.py`: 0 functions, 0 classes, 3 imports
 - `scripts/validate.py`: 3 functions, 0 classes, 5 imports

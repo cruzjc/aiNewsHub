@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-04-12T11:22:12.111217+00:00",
-  "repo_name": "aiNewsHub",
+  "generated_at": "2026-04-12T13:15:03.791737+00:00",
+  "repo_name": "ai-news-hub-runner",
   "top_level_directories": [
     ".agent",
     ".github",
@@ -161,7 +161,7 @@
     },
     {
       "path": "scripts/pi_maintainer_agent.py",
-      "functions": 8,
+      "functions": 9,
       "classes": 0,
       "imports": [
         "__future__",
