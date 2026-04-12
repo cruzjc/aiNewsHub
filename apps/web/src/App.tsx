@@ -2,7 +2,7 @@ import { startTransition, useDeferredValue, useEffect, useState } from "react";
 
 import { seedArticles, seedSources, type Article, type Source } from "@ainewshub/schema";
 
-const API_BASE = (import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3001").replace(/\/$/, "");
+const API_BASE = (import.meta.env.VITE_API_BASE_URL ?? "").replace(/\/$/, "");
 const fallbackTopics = Array.from(new Set(seedArticles.flatMap((article) => article.topics))).sort();
 const articleDate = new Intl.DateTimeFormat("en-US", {
   month: "short",
@@ -42,6 +42,8 @@ const buildQuery = (search: string, topic: string, source: string) => {
   return params.toString();
 };
 
+const apiPath = (path: string) => `${API_BASE}${path}`;
+
 export function App() {
   const [search, setSearch] = useState("");
   const [topic, setTopic] = useState("all");
@@ -53,9 +55,9 @@ export function App() {
   useEffect(() => {
     const controller = new AbortController();
 
-    const articlesUrl = `${API_BASE}/v1/articles?${buildQuery(deferredSearch, topic, source)}`;
-    const sourcesUrl = `${API_BASE}/v1/sources`;
-    const topicsUrl = `${API_BASE}/v1/topics`;
+    const articlesUrl = apiPath(`/v1/articles?${buildQuery(deferredSearch, topic, source)}`);
+    const sourcesUrl = apiPath("/v1/sources");
+    const topicsUrl = apiPath("/v1/topics");
 
     Promise.all([
       fetch(articlesUrl, { signal: controller.signal }),
@@ -111,7 +113,7 @@ export function App() {
             be easy to ingest.
           </p>
           <div className="hero-links">
-            <a href={`${API_BASE}/v1/articles`} target="_blank" rel="noreferrer">
+            <a href={apiPath("/v1/articles")} target="_blank" rel="noreferrer">
               Open JSON API
             </a>
             <a href="/llms.txt" target="_blank" rel="noreferrer">

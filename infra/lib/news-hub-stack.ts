@@ -1,8 +1,19 @@
-import { Duration, RemovalPolicy, Stack, StackProps, CfnOutput } from "aws-cdk-lib";
-import { Distribution, ViewerProtocolPolicy } from "aws-cdk-lib/aws-cloudfront";
-import { S3BucketOrigin } from "aws-cdk-lib/aws-cloudfront-origins";
+import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+import { Duration, Fn, RemovalPolicy, Stack, StackProps, CfnOutput } from "aws-cdk-lib";
+import {
+  AllowedMethods,
+  CachePolicy,
+  Distribution,
+  OriginRequestPolicy,
+  ViewerProtocolPolicy,
+} from "aws-cdk-lib/aws-cloudfront";
+import { HttpOrigin, S3BucketOrigin } from "aws-cdk-lib/aws-cloudfront-origins";
 import { HttpApi } from "aws-cdk-lib/aws-apigatewayv2";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
+import { BucketDeployment, Source } from "aws-cdk-lib/aws-s3-deployment";
 import { Bucket, BlockPublicAccess } from "aws-cdk-lib/aws-s3";
 import { Rule, Schedule } from "aws-cdk-lib/aws-events";
 import { SfnStateMachine } from "aws-cdk-lib/aws-events-targets";
@@ -20,19 +31,16 @@ export class AiNewsHubStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
+    const stackDirectory = dirname(fileURLToPath(import.meta.url));
+    const webDistPath = resolve(stackDirectory, "../../apps/web/dist");
+    const sourceRegistryPath = resolve(stackDirectory, "../../config/source-registry.json");
+    const sourceRegistryJson = readFileSync(sourceRegistryPath, "utf-8");
+
     const siteBucket = new Bucket(this, "SiteBucket", {
       autoDeleteObjects: false,
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
       encryption: undefined,
       removalPolicy: RemovalPolicy.RETAIN,
-    });
-
-    const distribution = new Distribution(this, "SiteDistribution", {
-      defaultBehavior: {
-        origin: S3BucketOrigin.withOriginAccessControl(siteBucket),
-        viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-      },
-      defaultRootObject: "index.html",
     });
 
     const contentTable = new Table(this, "ContentTable", {
@@ -96,6 +104,7 @@ export class AiNewsHubStack extends Stack {
       environment: {
         ENRICHMENT_QUEUE_URL: enrichmentQueue.queueUrl,
         OPENAI_SECRET_ARN: openAiSecret.secretArn,
+        SOURCE_REGISTRY_JSON: sourceRegistryJson,
       },
     });
 
@@ -152,6 +161,44 @@ export class AiNewsHubStack extends Stack {
       integration: new HttpLambdaIntegration("McpIntegration", mcpLambda),
     });
 
+    const apiOrigin = new HttpOrigin(Fn.select(2, Fn.split("/", api.apiEndpoint)));
+
+    const distribution = new Distribution(this, "SiteDistribution", {
+      defaultBehavior: {
+        origin: S3BucketOrigin.withOriginAccessControl(siteBucket),
+        viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+      },
+      defaultRootObject: "index.html",
+    });
+
+    const passthroughBehavior = {
+      origin: apiOrigin,
+      cachePolicy: CachePolicy.CACHING_DISABLED,
+      originRequestPolicy: OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
+      viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+    };
+
+    distribution.addBehavior("/v1/*", apiOrigin, {
+      ...passthroughBehavior,
+      allowedMethods: AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
+    });
+    distribution.addBehavior("/health", apiOrigin, {
+      ...passthroughBehavior,
+      allowedMethods: AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
+    });
+    distribution.addBehavior("/mcp*", apiOrigin, {
+      ...passthroughBehavior,
+      allowedMethods: AllowedMethods.ALLOW_ALL,
+    });
+
+    new BucketDeployment(this, "SiteDeployment", {
+      sources: [Source.asset(webDistPath)],
+      destinationBucket: siteBucket,
+      distribution,
+      distributionPaths: ["/*"],
+      prune: true,
+    });
+
     new Rule(this, "HourlyIngestRule", {
       schedule: Schedule.cron({
         minute: "15",
@@ -161,6 +208,7 @@ export class AiNewsHubStack extends Stack {
 
     new CfnOutput(this, "SiteBucketName", { value: siteBucket.bucketName });
     new CfnOutput(this, "DistributionDomainName", { value: distribution.distributionDomainName });
+    new CfnOutput(this, "SiteUrl", { value: `https://${distribution.distributionDomainName}` });
     new CfnOutput(this, "HttpApiUrl", { value: api.apiEndpoint });
     new CfnOutput(this, "ContentTableName", { value: contentTable.tableName });
   }

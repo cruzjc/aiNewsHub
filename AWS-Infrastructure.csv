@@ -1,11 +1,13 @@
 Service,Resource,Environment,Region,Identifier,Status,Notes
-S3,ai-news-hub-web,production,us-west-2,,planned,Static origin bucket for the public web build
-CloudFront,ai-news-hub-cdn,production,global,,planned,Public CDN for the site and llms.txt
-API Gateway,ai-news-hub-public-api,production,us-west-2,,planned,HTTP API for JSON and MCP traffic
-Lambda,ai-news-hub-api,production,us-west-2,,planned,JSON API runtime
-Lambda,ai-news-hub-mcp,production,us-west-2,,planned,Read-only MCP runtime
-Step Functions,ai-news-hub-ingest-pipeline,production,us-west-2,,planned,Hourly orchestrator for fetch and enrichment
-SQS,ai-news-hub-enrichment-queue,production,us-west-2,,planned,Buffered enrichment jobs
-DynamoDB,ai-news-hub-content,production,us-west-2,,planned,Article and source archive store
-Secrets Manager,ai-news-hub-openai-key,production,us-west-2,,planned,OpenAI API key storage
-EventBridge,ai-news-hub-hourly-trigger,production,us-west-2,,planned,Hourly trigger for the ingest pipeline
+S3,ai-news-hub-web,production,us-west-2,ainewshubstack-sitebucket397a1860-yamannm7q8lv,active,Static origin bucket for the public web build
+CloudFront,ai-news-hub-cdn,production,global,E3OTNLY0ERZ0IC,active,Public CDN for the site and llms.txt at https://d2o85ngn0n2e3t.cloudfront.net
+API Gateway,ai-news-hub-public-api,production,us-west-2,yhi91xn0v3,active,HTTP API for JSON and MCP traffic at https://yhi91xn0v3.execute-api.us-west-2.amazonaws.com
+Lambda,ai-news-hub-api,production,us-west-2,AiNewsHubStack-ApiLambda91D2282D-eaam5VkjGkqb,active,JSON API runtime
+Lambda,ai-news-hub-mcp,production,us-west-2,AiNewsHubStack-McpLambda1A73A172-UindugQoo2tZ,active,Read-only MCP runtime
+Lambda,ai-news-hub-hourly-ingest,production,us-west-2,AiNewsHubStack-HourlyIngestLambdaDD9A4530-azc3rJ8gfomM,active,Hourly ingestion Lambda
+Lambda,ai-news-hub-enrich-batch,production,us-west-2,AiNewsHubStack-EnrichBatchLambda86ABB483-rK5NbhAgL9lA,active,Queue-driven enrichment worker
+Step Functions,ai-news-hub-ingest-pipeline,production,us-west-2,arn:aws:states:us-west-2:202343234967:stateMachine:IngestStateMachineB1E20B88-lS0MrOU3hplJ,active,Hourly orchestrator for fetch and enrichment
+SQS,ai-news-hub-enrichment-queue,production,us-west-2,https://sqs.us-west-2.amazonaws.com/202343234967/AiNewsHubStack-EnrichmentQueue4D4E619F-ivKjExXiJbgf,active,Buffered enrichment jobs
+DynamoDB,ai-news-hub-content,production,us-west-2,AiNewsHubStack-ContentTableA82027C3-5WQ8HEI4E0DA,active,Article and source archive store
+Secrets Manager,ai-news-hub-openai-key,production,us-west-2,arn:aws:secretsmanager:us-west-2:202343234967:secret:ai-news-hub/openai-api-key-wsZ5a6,active,OpenAI API key storage
+EventBridge,ai-news-hub-hourly-trigger,production,us-west-2,AiNewsHubStack-HourlyIngestRule318E6DE5-m7xmrhUCPqbq,active,Hourly trigger for the ingest pipeline

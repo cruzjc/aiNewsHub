@@ -24,6 +24,9 @@ reports/*
 .agent/runtime/*
 !.agent/runtime/.gitkeep
 
+.codex
+.codex/
+
 apps/workers/.cache/
 apps/web/dist/
 apps/api/dist/

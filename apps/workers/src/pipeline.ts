@@ -1,4 +1,5 @@
 import { mkdir, writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
 
 import OpenAI from "openai";
 import { XMLParser } from "fast-xml-parser";
@@ -223,7 +224,7 @@ export const runHourlyIngest = async (sources: Source[]) => {
 };
 
 export const writeSnapshot = async (articles: Article[]) => {
-  const cacheDirectory = new URL("../.cache/", import.meta.url);
+  const cacheDirectory = resolve(process.cwd(), "apps/workers/.cache");
   await mkdir(cacheDirectory, { recursive: true });
-  await writeFile(new URL("latest-ingest.json", cacheDirectory), JSON.stringify(articles, null, 2));
+  await writeFile(resolve(cacheDirectory, "latest-ingest.json"), JSON.stringify(articles, null, 2));
 };

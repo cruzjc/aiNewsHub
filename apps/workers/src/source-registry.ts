@@ -1,10 +1,23 @@
 import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
-import { sourceSchema, type Source } from "@ainewshub/schema";
+import { seedSources, sourceSchema, type Source } from "@ainewshub/schema";
 
-const registryPath = new URL("../../../config/source-registry.json", import.meta.url);
+const parseRegistry = (raw: string): Source[] => {
+  const parsed = JSON.parse(raw) as unknown;
+  return sourceSchema.array().parse(parsed);
+};
 
 export const loadSourceRegistry = (): Source[] => {
-  const raw = JSON.parse(readFileSync(registryPath, "utf-8")) as unknown;
-  return sourceSchema.array().parse(raw);
+  if (process.env.SOURCE_REGISTRY_JSON) {
+    return parseRegistry(process.env.SOURCE_REGISTRY_JSON);
+  }
+
+  const registryPath = resolve(process.cwd(), "config/source-registry.json");
+
+  try {
+    return parseRegistry(readFileSync(registryPath, "utf-8"));
+  } catch {
+    return sourceSchema.array().parse(seedSources);
+  }
 };
