@@ -3,9 +3,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TARGET="${1:-pi13}"
-REMOTE_PATH="${2:-~/maintainers/ai-news-hub-runner}"
 RSYNC_RSH="${RSYNC_RSH:-ssh -o StrictHostKeyChecking=accept-new}"
-REMOTE_BARE_PATH="${REMOTE_BARE_PATH:-~/maintainers/ai-news-hub-origin.git}"
 
 case "$TARGET" in
   pi11)
@@ -27,6 +25,9 @@ case "$TARGET" in
 esac
 
 SSH_TARGET="${PI_USER}@${PI_HOST}"
+REMOTE_HOME="/home/${PI_USER}"
+REMOTE_PATH="${2:-${REMOTE_HOME}/maintainers/ai-news-hub-runner}"
+REMOTE_BARE_PATH="${REMOTE_BARE_PATH:-${REMOTE_HOME}/maintainers/ai-news-hub-origin.git}"
 
 ssh -o StrictHostKeyChecking=accept-new "$SSH_TARGET" "mkdir -p \"$REMOTE_PATH\" \"$REMOTE_PATH/logs/inbox\" \"$REMOTE_PATH/reports\" \"$REMOTE_PATH/.agent/runtime\""
 
