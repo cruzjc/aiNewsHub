@@ -1,0 +1,11 @@
+Service,Resource,Environment,Region,Identifier,Status,Notes
+S3,ai-news-hub-web,production,us-west-2,,planned,Static origin bucket for the public web build
+CloudFront,ai-news-hub-cdn,production,global,,planned,Public CDN for the site and llms.txt
+API Gateway,ai-news-hub-public-api,production,us-west-2,,planned,HTTP API for JSON and MCP traffic
+Lambda,ai-news-hub-api,production,us-west-2,,planned,JSON API runtime
+Lambda,ai-news-hub-mcp,production,us-west-2,,planned,Read-only MCP runtime
+Step Functions,ai-news-hub-ingest-pipeline,production,us-west-2,,planned,Hourly orchestrator for fetch and enrichment
+SQS,ai-news-hub-enrichment-queue,production,us-west-2,,planned,Buffered enrichment jobs
+DynamoDB,ai-news-hub-content,production,us-west-2,,planned,Article and source archive store
+Secrets Manager,ai-news-hub-openai-key,production,us-west-2,,planned,OpenAI API key storage
+EventBridge,ai-news-hub-hourly-trigger,production,us-west-2,,planned,Hourly trigger for the ingest pipeline

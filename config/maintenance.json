@@ -1,0 +1,66 @@
+{
+  "contract_version": 1,
+  "project": {
+    "name": "aiNewsHub",
+    "description": "Agent-first news hub with AWS delivery and a Pi13 scheduled maintainer",
+    "primary_branch": "main"
+  },
+  "maintenance": {
+    "mode": "autonomous_fixer",
+    "lock_file": ".agent/maintenance.lock",
+    "lock_stale_after_seconds": 7200,
+    "max_files_per_run": 5,
+    "protected_paths": [
+      ".env",
+      ".env.",
+      "secrets/",
+      ".git/",
+      "infra/",
+      ".github/workflows/",
+      "deployment/live/",
+      "AWS-Infrastructure.csv"
+    ]
+  },
+  "reconcile": {
+    "enabled": true,
+    "remote": "origin",
+    "branch": "main",
+    "strategy": "fast_forward_only",
+    "on_dirty_workspace": "skip",
+    "on_diverged": "report_only"
+  },
+  "logs": {
+    "backend": "local",
+    "directory": "logs",
+    "inbox_directory": "logs/inbox",
+    "lookback_hours": 72,
+    "extensions": [
+      ".log",
+      ".json",
+      ".jsonl",
+      ".txt"
+    ]
+  },
+  "reports": {
+    "directory": "reports"
+  },
+  "repo_map": {
+    "json_path": "repo_map.json",
+    "markdown_path": "REPO_MAP.md"
+  },
+  "agent": {
+    "enabled": true,
+    "command": "python scripts/pi_maintainer_agent.py",
+    "prompt_file": "prompts/maintenance.md",
+    "preflight_report_path": ".agent/runtime/preflight.json"
+  },
+  "validation": {
+    "enabled": true,
+    "command": "python scripts/validate.py"
+  },
+  "schedule": {
+    "linux_cron": "15 * * * *",
+    "windows_interval_minutes": 60,
+    "task_name": "ai-news-hub-maintenance"
+  }
+}

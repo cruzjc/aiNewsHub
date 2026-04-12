@@ -1,0 +1,12 @@
+AI News Hub is a public, agent-first news source.
+
+Primary interfaces:
+- JSON API: /v1/articles, /v1/articles/{id}, /v1/sources, /v1/topics, /health
+- MCP tools: list_articles, get_article, list_sources, list_topics
+
+Behavior:
+- allowlisted feeds only
+- single-article items
+- broad-spectrum coverage
+- hourly ingest
+- link out to publishers rather than mirroring full text

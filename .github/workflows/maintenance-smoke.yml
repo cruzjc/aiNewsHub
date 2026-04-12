@@ -1,0 +1,27 @@
+name: Maintenance smoke test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run maintenance in safe mode
+        shell: bash
+        run: |
+          set +e
+          python scripts/run_maintenance.py --mode manual --skip-reconcile --skip-agent
+          status=$?
+          set -e
+          if [ "$status" -ne 0 ] && [ "$status" -ne 2 ]; then
+            exit "$status"
+          fi

@@ -1,0 +1,24 @@
+{
+  "name": "ai-news-hub",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.33.0",
+  "scripts": {
+    "build": "pnpm -r build",
+    "check": "pnpm -r check",
+    "test": "pnpm -r test",
+    "validate:workspace": "pnpm build && pnpm test",
+    "dev:api": "pnpm --filter @ainewshub/api dev",
+    "dev:web": "pnpm --filter @ainewshub/web dev",
+    "dev:mcp": "pnpm --filter @ainewshub/mcp dev",
+    "dev:workers": "pnpm --filter @ainewshub/workers dev",
+    "infra:synth": "pnpm --filter @ainewshub/infra cdk synth"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}

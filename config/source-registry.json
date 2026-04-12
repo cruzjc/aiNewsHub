@@ -1,0 +1,99 @@
+[
+  {
+    "id": "reuters-world",
+    "name": "Reuters World News",
+    "homepageUrl": "https://www.reuters.com/world/",
+    "feedUrl": "https://feeds.reuters.com/reuters/worldNews",
+    "language": "en",
+    "topics": [
+      "world",
+      "politics"
+    ],
+    "priority": 10
+  },
+  {
+    "id": "reuters-business",
+    "name": "Reuters Business News",
+    "homepageUrl": "https://www.reuters.com/markets/",
+    "feedUrl": "https://feeds.reuters.com/reuters/businessNews",
+    "language": "en",
+    "topics": [
+      "business",
+      "markets"
+    ],
+    "priority": 10
+  },
+  {
+    "id": "associated-press-top-news",
+    "name": "Associated Press Top News",
+    "homepageUrl": "https://apnews.com/",
+    "feedUrl": "https://apnews.com/hub/ap-top-news?output=amp",
+    "language": "en",
+    "topics": [
+      "world",
+      "politics",
+      "business"
+    ],
+    "priority": 9
+  },
+  {
+    "id": "bbc-world",
+    "name": "BBC World",
+    "homepageUrl": "https://www.bbc.com/news/world",
+    "feedUrl": "http://feeds.bbci.co.uk/news/world/rss.xml",
+    "language": "en",
+    "topics": [
+      "world"
+    ],
+    "priority": 8
+  },
+  {
+    "id": "guardian-world",
+    "name": "The Guardian World News",
+    "homepageUrl": "https://www.theguardian.com/world",
+    "feedUrl": "https://www.theguardian.com/world/rss",
+    "language": "en",
+    "topics": [
+      "world",
+      "politics"
+    ],
+    "priority": 8
+  },
+  {
+    "id": "npr-news",
+    "name": "NPR News",
+    "homepageUrl": "https://www.npr.org/sections/news/",
+    "feedUrl": "https://feeds.npr.org/1001/rss.xml",
+    "language": "en",
+    "topics": [
+      "world",
+      "politics",
+      "culture"
+    ],
+    "priority": 8
+  },
+  {
+    "id": "ars-technica",
+    "name": "Ars Technica",
+    "homepageUrl": "https://arstechnica.com/",
+    "feedUrl": "https://feeds.arstechnica.com/arstechnica/index",
+    "language": "en",
+    "topics": [
+      "technology",
+      "science",
+      "ai"
+    ],
+    "priority": 7
+  },
+  {
+    "id": "espn-top",
+    "name": "ESPN Top Headlines",
+    "homepageUrl": "https://www.espn.com/",
+    "feedUrl": "https://www.espn.com/espn/rss/news",
+    "language": "en",
+    "topics": [
+      "sports"
+    ],
+    "priority": 6
+  }
+]

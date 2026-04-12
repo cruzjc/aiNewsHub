@@ -1,0 +1,531 @@
+{
+  "generated_at": "2026-04-12T11:22:12.111217+00:00",
+  "repo_name": "aiNewsHub",
+  "top_level_directories": [
+    ".agent",
+    ".github",
+    "apps",
+    "config",
+    "data",
+    "docs",
+    "infra",
+    "logs",
+    "node_modules",
+    "packages",
+    "prompts",
+    "reconciler",
+    "reports",
+    "scripts",
+    "tests"
+  ],
+  "top_level_files": [
+    ".gitignore",
+    ".nvmrc",
+    "AGENT_RULES.md",
+    "AWS-Infrastructure.csv",
+    "BOOTSTRAP_INSTRUCTIONS.md",
+    "PROJECT_SPEC.md",
+    "README.md",
+    "REPO_MAP.md",
+    "RUNNER_CONTRACT.md",
+    "package.json",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
+    "repo_map.json",
+    "tsconfig.base.json"
+  ],
+  "entrypoints": [
+    "apps/api/src/lambda.ts",
+    "apps/api/src/server.ts",
+    "apps/mcp/src/http.ts",
+    "apps/mcp/src/server.ts",
+    "apps/web/src/main.tsx",
+    "apps/web/vite.config.ts",
+    "apps/workers/src/handlers.ts",
+    "infra/bin/app.ts",
+    "scripts/collect_logs.py",
+    "scripts/invoke_agent.py",
+    "scripts/pi_maintainer_agent.py",
+    "scripts/run_maintenance.py",
+    "scripts/update_repo_map.py",
+    "scripts/validate.py"
+  ],
+  "python_files": [
+    {
+      "path": "reconciler/__init__.py",
+      "functions": 0,
+      "classes": 0,
+      "imports": []
+    },
+    {
+      "path": "reconciler/agent_runner.py",
+      "functions": 1,
+      "classes": 0,
+      "imports": [
+        "__future__",
+        "common",
+        "os",
+        "pathlib"
+      ]
+    },
+    {
+      "path": "reconciler/common.py",
+      "functions": 14,
+      "classes": 0,
+      "imports": [
+        "__future__",
+        "datetime",
+        "json",
+        "os",
+        "pathlib",
+        "shlex",
+        "subprocess",
+        "typing"
+      ]
+    },
+    {
+      "path": "reconciler/gitops.py",
+      "functions": 4,
+      "classes": 1,
+      "imports": [
+        "__future__",
+        "common",
+        "dataclasses",
+        "pathlib"
+      ]
+    },
+    {
+      "path": "reconciler/log_ingest.py",
+      "functions": 2,
+      "classes": 0,
+      "imports": [
+        "__future__",
+        "common",
+        "pathlib"
+      ]
+    },
+    {
+      "path": "reconciler/mapping.py",
+      "functions": 7,
+      "classes": 2,
+      "imports": [
+        "__future__",
+        "ast",
+        "common",
+        "dataclasses",
+        "json",
+        "pathlib",
+        "re"
+      ]
+    },
+    {
+      "path": "reconciler/runner.py",
+      "functions": 8,
+      "classes": 0,
+      "imports": [
+        "__future__",
+        "agent_runner",
+        "argparse",
+        "common",
+        "gitops",
+        "json",
+        "log_ingest",
+        "mapping",
+        "os",
+        "pathlib",
+        "sys"
+      ]
+    },
+    {
+      "path": "scripts/collect_logs.py",
+      "functions": 0,
+      "classes": 0,
+      "imports": [
+        "pathlib",
+        "reconciler.log_ingest",
+        "reconciler.runner",
+        "sys"
+      ]
+    },
+    {
+      "path": "scripts/invoke_agent.py",
+      "functions": 1,
+      "classes": 0,
+      "imports": [
+        "argparse",
+        "pathlib",
+        "reconciler.agent_runner",
+        "reconciler.runner",
+        "sys"
+      ]
+    },
+    {
+      "path": "scripts/pi_maintainer_agent.py",
+      "functions": 8,
+      "classes": 0,
+      "imports": [
+        "__future__",
+        "json",
+        "os",
+        "pathlib",
+        "re",
+        "reconciler.runner",
+        "subprocess",
+        "sys",
+        "urllib.error",
+        "urllib.parse",
+        "urllib.request"
+      ]
+    },
+    {
+      "path": "scripts/run_maintenance.py",
+      "functions": 0,
+      "classes": 0,
+      "imports": [
+        "pathlib",
+        "reconciler.runner",
+        "sys"
+      ]
+    },
+    {
+      "path": "scripts/update_repo_map.py",
+      "functions": 0,
+      "classes": 0,
+      "imports": [
+        "pathlib",
+        "reconciler.mapping",
+        "sys"
+      ]
+    },
+    {
+      "path": "scripts/validate.py",
+      "functions": 3,
+      "classes": 0,
+      "imports": [
+        "__future__",
+        "pathlib",
+        "shutil",
+        "subprocess",
+        "sys"
+      ]
+    },
+    {
+      "path": "tests/test_runner_contract.py",
+      "functions": 6,
+      "classes": 1,
+      "imports": [
+        "__future__",
+        "json",
+        "pathlib",
+        "reconciler.gitops",
+        "reconciler.mapping",
+        "reconciler.runner",
+        "tempfile",
+        "unittest"
+      ]
+    },
+    {
+      "path": "tests/test_scheduler_scripts.py",
+      "functions": 3,
+      "classes": 1,
+      "imports": [
+        "__future__",
+        "pathlib",
+        "unittest"
+      ]
+    }
+  ],
+  "typescript_files": [
+    {
+      "path": "apps/api/src/app.test.ts",
+      "exports": 0,
+      "functions": 0,
+      "imports": [
+        "./app.js",
+        "vitest"
+      ]
+    },
+    {
+      "path": "apps/api/src/app.ts",
+      "exports": 2,
+      "functions": 2,
+      "imports": [
+        "./repository.js",
+        "@ainewshub/schema",
+        "hono",
+        "hono/http-exception"
+      ]
+    },
+    {
+      "path": "apps/api/src/lambda.ts",
+      "exports": 1,
+      "functions": 0,
+      "imports": [
+        "./app.js",
+        "hono/aws-lambda"
+      ]
+    },
+    {
+      "path": "apps/api/src/repository.ts",
+      "exports": 3,
+      "functions": 0,
+      "imports": [
+        "@ainewshub/schema"
+      ]
+    },
+    {
+      "path": "apps/api/src/server.ts",
+      "exports": 0,
+      "functions": 0,
+      "imports": [
+        "./app.js",
+        "@hono/node-server"
+      ]
+    },
+    {
+      "path": "apps/mcp/src/http.ts",
+      "exports": 1,
+      "functions": 0,
+      "imports": [
+        "./transport.js",
+        "serverless-http"
+      ]
+    },
+    {
+      "path": "apps/mcp/src/server.ts",
+      "exports": 0,
+      "functions": 0,
+      "imports": [
+        "./transport.js"
+      ]
+    },
+    {
+      "path": "apps/mcp/src/stdio.ts",
+      "exports": 0,
+      "functions": 0,
+      "imports": [
+        "./tools.js",
+        "@modelcontextprotocol/sdk/server/stdio.js"
+      ]
+    },
+    {
+      "path": "apps/mcp/src/tools.ts",
+      "exports": 1,
+      "functions": 1,
+      "imports": [
+        "@ainewshub/schema",
+        "@modelcontextprotocol/sdk/server/mcp.js",
+        "zod/v4"
+      ]
+    },
+    {
+      "path": "apps/mcp/src/transport.ts",
+      "exports": 1,
+      "functions": 3,
+      "imports": [
+        "./tools.js",
+        "@modelcontextprotocol/sdk/server/express.js",
+        "@modelcontextprotocol/sdk/server/streamableHttp.js",
+        "@modelcontextprotocol/sdk/types.js",
+        "express",
+        "node:crypto"
+      ]
+    },
+    {
+      "path": "apps/web/src/vite-env.d.ts",
+      "exports": 0,
+      "functions": 0,
+      "imports": []
+    },
+    {
+      "path": "apps/web/vite.config.ts",
+      "exports": 1,
+      "functions": 0,
+      "imports": [
+        "@vitejs/plugin-react",
+        "vite"
+      ]
+    },
+    {
+      "path": "apps/workers/src/handlers.ts",
+      "exports": 2,
+      "functions": 2,
+      "imports": [
+        "./pipeline.js",
+        "./source-registry.js"
+      ]
+    },
+    {
+      "path": "apps/workers/src/index.ts",
+      "exports": 0,
+      "functions": 0,
+      "imports": [
+        "./pipeline.js",
+        "./source-registry.js"
+      ]
+    },
+    {
+      "path": "apps/workers/src/pipeline.test.ts",
+      "exports": 0,
+      "functions": 0,
+      "imports": [
+        "./pipeline.js",
+        "./source-registry.js",
+        "vitest"
+      ]
+    },
+    {
+      "path": "apps/workers/src/pipeline.ts",
+      "exports": 7,
+      "functions": 12,
+      "imports": [
+        "@ainewshub/schema",
+        "fast-xml-parser",
+        "node:fs/promises",
+        "openai"
+      ]
+    },
+    {
+      "path": "apps/workers/src/source-registry.ts",
+      "exports": 1,
+      "functions": 1,
+      "imports": [
+        "@ainewshub/schema",
+        "node:fs"
+      ]
+    },
+    {
+      "path": "infra/bin/app.ts",
+      "exports": 0,
+      "functions": 0,
+      "imports": [
+        "../lib/news-hub-stack.js",
+        "aws-cdk-lib"
+      ]
+    },
+    {
+      "path": "infra/lib/news-hub-stack.ts",
+      "exports": 1,
+      "functions": 0,
+      "imports": [
+        "aws-cdk-lib",
+        "aws-cdk-lib/aws-apigatewayv2",
+        "aws-cdk-lib/aws-apigatewayv2-integrations",
+        "aws-cdk-lib/aws-cloudfront",
+        "aws-cdk-lib/aws-cloudfront-origins",
+        "aws-cdk-lib/aws-dynamodb",
+        "aws-cdk-lib/aws-events",
+        "aws-cdk-lib/aws-events-targets",
+        "aws-cdk-lib/aws-lambda",
+        "aws-cdk-lib/aws-lambda-event-sources",
+        "aws-cdk-lib/aws-lambda-nodejs",
+        "aws-cdk-lib/aws-s3",
+        "aws-cdk-lib/aws-secretsmanager",
+        "aws-cdk-lib/aws-sqs",
+        "aws-cdk-lib/aws-stepfunctions",
+        "aws-cdk-lib/aws-stepfunctions-tasks",
+        "constructs"
+      ]
+    },
+    {
+      "path": "packages/schema/src/data.ts",
+      "exports": 10,
+      "functions": 1,
+      "imports": [
+        "zod"
+      ]
+    },
+    {
+      "path": "packages/schema/src/index.test.ts",
+      "exports": 0,
+      "functions": 0,
+      "imports": [
+        "./index.js",
+        "./query.js",
+        "vitest"
+      ]
+    },
+    {
+      "path": "packages/schema/src/index.ts",
+      "exports": 2,
+      "functions": 0,
+      "imports": [
+        "./data.js",
+        "./query.js"
+      ]
+    },
+    {
+      "path": "packages/schema/src/query.ts",
+      "exports": 6,
+      "functions": 7,
+      "imports": [
+        "./data.js"
+      ]
+    },
+    {
+      "path": "apps/web/src/App.tsx",
+      "exports": 1,
+      "functions": 3,
+      "imports": [
+        "@ainewshub/schema",
+        "react"
+      ]
+    },
+    {
+      "path": "apps/web/src/main.tsx",
+      "exports": 0,
+      "functions": 0,
+      "imports": [
+        "./App.js",
+        "react",
+        "react-dom/client"
+      ]
+    }
+  ],
+  "internal_dependency_edges": [
+    {
+      "source": "scripts/collect_logs.py",
+      "targets": [
+        "reconciler.log_ingest",
+        "reconciler.runner"
+      ]
+    },
+    {
+      "source": "scripts/invoke_agent.py",
+      "targets": [
+        "reconciler.agent_runner",
+        "reconciler.runner"
+      ]
+    },
+    {
+      "source": "scripts/pi_maintainer_agent.py",
+      "targets": [
+        "reconciler.runner"
+      ]
+    },
+    {
+      "source": "scripts/run_maintenance.py",
+      "targets": [
+        "reconciler.runner"
+      ]
+    },
+    {
+      "source": "scripts/update_repo_map.py",
+      "targets": [
+        "reconciler.mapping"
+      ]
+    },
+    {
+      "source": "tests/test_runner_contract.py",
+      "targets": [
+        "reconciler.gitops",
+        "reconciler.mapping",
+        "reconciler.runner"
+      ]
+    }
+  ],
+  "notes": [
+    "Runtime folders such as logs/, reports/, and .agent/runtime/ are intentionally excluded from dependency analysis.",
+    "The generator focuses on Python and TypeScript structure plus top-level repository anatomy."
+  ]
+}

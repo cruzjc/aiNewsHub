@@ -1,0 +1,9 @@
+graph TD
+  Scheduler[Scheduler] --> Runner[run_maintenance.py]
+  Runner --> Lock[Lock]
+  Runner --> Reconcile[Reconcile workspace]
+  Runner --> Map[Refresh repo map]
+  Runner --> Observe[Collect logs]
+  Runner --> Agent[Invoke agent hook]
+  Runner --> Validate[Run validation]
+  Runner --> Report[Write report]
