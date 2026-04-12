@@ -66,6 +66,18 @@ def changed_files() -> list[str]:
     return files
 
 
+def current_branch() -> str | None:
+    result = subprocess.run(
+        ["git", "branch", "--show-current"],
+        cwd=str(ROOT),
+        check=False,
+        text=True,
+        capture_output=True,
+    )
+    branch = result.stdout.strip()
+    return branch or None
+
+
 def touches_protected_path(paths: list[str], protected_paths: list[str]) -> str | None:
     for path in paths:
         normalized = path.replace("\\", "/")
@@ -124,6 +136,7 @@ def main() -> int:
     config = load_config()
     protected_paths = list(config.get("maintenance", {}).get("protected_paths", []))
     max_files = int(config.get("maintenance", {}).get("max_files_per_run", 5))
+    starting_branch = current_branch() or config.get("project", {}).get("primary_branch", "main")
 
     fix_command = os.environ.get("AINEWSHUB_AUTOFIX_COMMAND", "").strip()
     if fix_command:
@@ -147,41 +160,45 @@ def main() -> int:
         return 1
 
     branch = os.environ.get("AINEWSHUB_MAINTENANCE_BRANCH", "maintainer/pi13")
-    ensure_branch(branch)
-    subprocess.run(["git", "add", *files], cwd=str(ROOT), check=True)
-    subprocess.run(
-        ["git", "commit", "-m", "chore: pi13 maintenance update"],
-        cwd=str(ROOT),
-        check=False,
-    )
+    try:
+        ensure_branch(branch)
+        subprocess.run(["git", "add", *files], cwd=str(ROOT), check=True)
+        subprocess.run(
+            ["git", "commit", "-m", "chore: pi13 maintenance update"],
+            cwd=str(ROOT),
+            check=False,
+        )
 
-    if not has_remote("origin"):
-        print("origin remote is not configured; commit created locally only")
+        if not has_remote("origin"):
+            print("origin remote is not configured; commit created locally only")
+            return 0
+
+        push_result = subprocess.run(
+            ["git", "push", "--set-upstream", "origin", branch],
+            cwd=str(ROOT),
+            check=False,
+            text=True,
+            capture_output=True,
+        )
+        if push_result.returncode != 0:
+            print(push_result.stderr or push_result.stdout, file=sys.stderr)
+            return push_result.returncode
+
+        token = os.environ.get("GITHUB_TOKEN", "").strip()
+        repo_full_name = parse_origin_repo()
+        if token and repo_full_name:
+            try:
+                create_or_update_pr(branch, repo_full_name, token)
+            except urllib.error.URLError as exc:
+                print(f"push succeeded but PR creation failed: {exc}", file=sys.stderr)
+                return 1
+        else:
+            print("push succeeded but GITHUB_TOKEN or origin repo metadata is missing; PR not created")
+
         return 0
-
-    push_result = subprocess.run(
-        ["git", "push", "--set-upstream", "origin", branch],
-        cwd=str(ROOT),
-        check=False,
-        text=True,
-        capture_output=True,
-    )
-    if push_result.returncode != 0:
-        print(push_result.stderr or push_result.stdout, file=sys.stderr)
-        return push_result.returncode
-
-    token = os.environ.get("GITHUB_TOKEN", "").strip()
-    repo_full_name = parse_origin_repo()
-    if token and repo_full_name:
-        try:
-            create_or_update_pr(branch, repo_full_name, token)
-        except urllib.error.URLError as exc:
-            print(f"push succeeded but PR creation failed: {exc}", file=sys.stderr)
-            return 1
-    else:
-        print("push succeeded but GITHUB_TOKEN or origin repo metadata is missing; PR not created")
-
-    return 0
+    finally:
+        if starting_branch != branch:
+            subprocess.run(["git", "checkout", starting_branch], cwd=str(ROOT), check=False)
 
 
 if __name__ == "__main__":
