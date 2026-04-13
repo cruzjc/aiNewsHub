@@ -1,33 +1,9 @@
 [
   {
-    "id": "reuters-world",
-    "name": "Reuters World News",
-    "homepageUrl": "https://www.reuters.com/world/",
-    "feedUrl": "https://feeds.reuters.com/reuters/worldNews",
-    "language": "en",
-    "topics": [
-      "world",
-      "politics"
-    ],
-    "priority": 10
-  },
-  {
-    "id": "reuters-business",
-    "name": "Reuters Business News",
-    "homepageUrl": "https://www.reuters.com/markets/",
-    "feedUrl": "https://feeds.reuters.com/reuters/businessNews",
-    "language": "en",
-    "topics": [
-      "business",
-      "markets"
-    ],
-    "priority": 10
-  },
-  {
-    "id": "associated-press-top-news",
-    "name": "Associated Press Top News",
-    "homepageUrl": "https://apnews.com/",
-    "feedUrl": "https://apnews.com/hub/ap-top-news?output=amp",
+    "id": "cbs-top-news",
+    "name": "CBS News Top Stories",
+    "homepageUrl": "https://www.cbsnews.com/",
+    "feedUrl": "https://www.cbsnews.com/latest/rss/main",
     "language": "en",
     "topics": [
       "world",
@@ -37,10 +13,34 @@
     "priority": 9
   },
   {
+    "id": "abc-world",
+    "name": "ABC News International",
+    "homepageUrl": "https://abcnews.go.com/International",
+    "feedUrl": "https://abcnews.go.com/abcnews/internationalheadlines",
+    "language": "en",
+    "topics": [
+      "world",
+      "politics"
+    ],
+    "priority": 9
+  },
+  {
+    "id": "cbs-business",
+    "name": "CBS News Business",
+    "homepageUrl": "https://www.cbsnews.com/business/",
+    "feedUrl": "https://www.cbsnews.com/latest/rss/business",
+    "language": "en",
+    "topics": [
+      "business",
+      "markets"
+    ],
+    "priority": 9
+  },
+  {
     "id": "bbc-world",
     "name": "BBC World",
     "homepageUrl": "https://www.bbc.com/news/world",
-    "feedUrl": "http://feeds.bbci.co.uk/news/world/rss.xml",
+    "feedUrl": "https://feeds.bbci.co.uk/news/world/rss.xml",
     "language": "en",
     "topics": [
       "world"

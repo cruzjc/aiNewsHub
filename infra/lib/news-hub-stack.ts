@@ -98,6 +98,8 @@ export class AiNewsHubStack extends Stack {
       runtime: Runtime.NODEJS_22_X,
       entry: "../apps/workers/src/handlers.ts",
       handler: "hourlyIngestHandler",
+      timeout: Duration.minutes(2),
+      memorySize: 512,
       bundling: {
         target: "node22",
       },
@@ -105,6 +107,9 @@ export class AiNewsHubStack extends Stack {
         ENRICHMENT_QUEUE_URL: enrichmentQueue.queueUrl,
         OPENAI_SECRET_ARN: openAiSecret.secretArn,
         SOURCE_REGISTRY_JSON: sourceRegistryJson,
+        MAX_CANDIDATES_PER_SOURCE: "8",
+        MAX_CANDIDATES_PER_RUN: "24",
+        ENRICHMENT_CONCURRENCY: "4",
       },
     });
 

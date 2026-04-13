@@ -15,9 +15,24 @@ import {
 const parser = new XMLParser({
   ignoreAttributes: false,
   attributeNamePrefix: "",
+  processEntities: false,
 });
 const secretsClient = new SecretsManagerClient({});
 let cachedResolvedApiKey: string | null | undefined;
+const feedRequestHeaders = {
+  accept: "application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.1",
+  "user-agent": "aiNewsHub/1.0 (+https://github.com/cruzjc/aiNewsHub)",
+};
+const feedFetchTimeoutMs = 20_000;
+
+const readPositiveInteger = (value: string | undefined, fallback: number) => {
+  const parsed = Number.parseInt(value ?? "", 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+};
+
+const maxCandidatesPerSource = () => readPositiveInteger(process.env.MAX_CANDIDATES_PER_SOURCE, 8);
+const maxCandidatesPerRun = () => readPositiveInteger(process.env.MAX_CANDIDATES_PER_RUN, 24);
+const enrichmentConcurrency = () => readPositiveInteger(process.env.ENRICHMENT_CONCURRENCY, 4);
 
 export type ArticleCandidate = Omit<Article, "id" | "rankScore" | "confidenceScore" | "enrichmentStatus"> & {
   excerpt?: string;
@@ -127,6 +142,8 @@ export const dedupeCandidates = (candidates: ArticleCandidate[]): ArticleCandida
   return deduped;
 };
 
+export const looksLikeFeedDocument = (body: string): boolean => /<(rss|feed)\b/i.test(body);
+
 const fallbackSummary = (candidate: ArticleCandidate) => {
   const compactExcerpt = (candidate.excerpt ?? candidate.summary).slice(0, 240);
   return {
@@ -138,6 +155,33 @@ const fallbackSummary = (candidate: ArticleCandidate) => {
     rankScore: 60 + candidate.topics.length * 6,
     enrichmentStatus: "fallback" as const,
   };
+};
+
+export const coerceStringList = (value: unknown, fallback: string[], limit = 8): string[] => {
+  if (!Array.isArray(value)) {
+    return fallback;
+  }
+
+  const normalized = value
+    .flatMap((item) => {
+      if (typeof item === "string") {
+        return [item.trim()];
+      }
+
+      if (item && typeof item === "object") {
+        for (const key of ["name", "label", "text", "title"]) {
+          const candidate = (item as Record<string, unknown>)[key];
+          if (typeof candidate === "string" && candidate.trim()) {
+            return [candidate.trim()];
+          }
+        }
+      }
+
+      return [];
+    })
+    .filter((item) => item.length > 0);
+
+  return normalized.length > 0 ? normalized.slice(0, limit) : fallback;
 };
 
 export const parseOpenAiSecretString = (secretValue: string): string | null => {
@@ -246,8 +290,8 @@ const enrichWithOpenAI = async (candidate: ArticleCandidate): Promise<Pick<Artic
     return {
       summary: parsed.summary?.trim() || fallbackSummary(candidate).summary,
       whyItMatters: parsed.whyItMatters?.trim() || fallbackSummary(candidate).whyItMatters,
-      tags: parsed.tags?.slice(0, 8) || fallbackSummary(candidate).tags,
-      entities: parsed.entities?.slice(0, 8) || candidate.entities,
+      tags: coerceStringList(parsed.tags, fallbackSummary(candidate).tags),
+      entities: coerceStringList(parsed.entities, candidate.entities),
       confidenceScore: Math.min(1, Math.max(0, parsed.confidenceScore ?? 0.78)),
       rankScore: Math.max(0, parsed.rankScore ?? 82),
       enrichmentStatus: "enriched",
@@ -272,19 +316,62 @@ export const enrichCandidate = async (candidate: ArticleCandidate): Promise<Arti
   });
 };
 
-export const runHourlyIngest = async (sources: Source[]) => {
-  const fetched = await Promise.all(
-    sources.map(async (source) => {
-      const response = await fetch(source.feedUrl);
-      if (!response.ok) {
-        return [];
+export const fetchSourceCandidates = async (source: Source): Promise<ArticleCandidate[]> => {
+  try {
+    const response = await fetch(source.feedUrl, {
+      headers: feedRequestHeaders,
+      signal: AbortSignal.timeout(feedFetchTimeoutMs),
+    });
+    if (!response.ok) {
+      console.warn(`feed fetch returned ${response.status} for ${source.id} (${source.feedUrl})`);
+      return [];
+    }
+
+    const payload = await response.text();
+    if (!looksLikeFeedDocument(payload)) {
+      console.warn(`feed payload did not look like RSS or Atom for ${source.id} (${source.feedUrl})`);
+      return [];
+    }
+
+    return normalizeFeed(source, payload).slice(0, maxCandidatesPerSource());
+  } catch (error) {
+    console.error(`feed fetch failed for ${source.id} (${source.feedUrl})`, error);
+    return [];
+  }
+};
+
+const mapWithConcurrency = async <T, R>(
+  items: T[],
+  concurrency: number,
+  mapper: (item: T, index: number) => Promise<R>,
+): Promise<R[]> => {
+  const results = new Array<R>(items.length);
+  let nextIndex = 0;
+
+  const worker = async () => {
+    while (true) {
+      const currentIndex = nextIndex;
+      nextIndex += 1;
+      if (currentIndex >= items.length) {
+        return;
       }
-      const xml = await response.text();
-      return normalizeFeed(source, xml);
-    }),
+
+      results[currentIndex] = await mapper(items[currentIndex] as T, currentIndex);
+    }
+  };
+
+  const workers = Array.from({ length: Math.min(concurrency, items.length) }, () => worker());
+  await Promise.all(workers);
+  return results;
+};
+
+export const runHourlyIngest = async (sources: Source[]) => {
+  const fetched = await Promise.all(sources.map(fetchSourceCandidates));
+  const deduped = dedupeCandidates(fetched.flat()).sort(
+    (left, right) => new Date(right.publishedAt).getTime() - new Date(left.publishedAt).getTime(),
   );
-  const deduped = dedupeCandidates(fetched.flat());
-  const articles = await Promise.all(deduped.map(enrichCandidate));
+  const selected = deduped.slice(0, maxCandidatesPerRun());
+  const articles = await mapWithConcurrency(selected, enrichmentConcurrency(), enrichCandidate);
   return articles.sort((left, right) => right.rankScore - left.rankScore);
 };
 

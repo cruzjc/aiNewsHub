@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import os
 import re
 from dataclasses import dataclass, asdict
 from pathlib import Path
@@ -43,6 +44,31 @@ def _is_ignored(path: Path) -> bool:
     if ".agent" in parts and "runtime" in parts:
         return True
     return bool(parts & IGNORED_DIRS)
+
+
+def _iter_repo_files(root: Path, suffixes: tuple[str, ...]) -> list[Path]:
+    matches: list[Path] = []
+
+    for directory, dirnames, filenames in os.walk(root):
+        current = Path(directory)
+
+        if _is_ignored(current):
+            dirnames[:] = []
+            continue
+
+        current_parts = set(current.parts)
+        dirnames[:] = [
+            dirname
+            for dirname in dirnames
+            if dirname not in IGNORED_DIRS and not (dirname == "runtime" and ".agent" in current_parts)
+        ]
+
+        for filename in filenames:
+            path = current / filename
+            if path.suffix in suffixes and not _is_ignored(path):
+                matches.append(path)
+
+    return sorted(matches)
 
 
 def _scan_python_file(path: Path, root: Path) -> PythonFileSummary | None:
@@ -111,9 +137,7 @@ def build_repo_map(root: Path | None = None) -> dict:
     dependency_edges: list[dict] = []
     typescript_summaries: list[TypeScriptFileSummary] = []
 
-    for path in sorted(root.rglob("*.py")):
-        if _is_ignored(path):
-            continue
+    for path in _iter_repo_files(root, (".py",)):
         summary = _scan_python_file(path, root)
         if not summary:
             continue
@@ -124,9 +148,7 @@ def build_repo_map(root: Path | None = None) -> dict:
         if filename in {"main.py", "app.py", "run.py"} or relpath.startswith("scripts/"):
             entrypoints.append(relpath)
 
-    for path in sorted(root.rglob("*.ts")) + sorted(root.rglob("*.tsx")):
-        if _is_ignored(path):
-            continue
+    for path in _iter_repo_files(root, (".ts", ".tsx")):
         summary = _scan_typescript_file(path, root)
         if not summary:
             continue
