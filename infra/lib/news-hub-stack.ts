@@ -106,6 +106,7 @@ export class AiNewsHubStack extends Stack {
       environment: {
         ENRICHMENT_QUEUE_URL: enrichmentQueue.queueUrl,
         OPENAI_SECRET_ARN: openAiSecret.secretArn,
+        OPENAI_MODEL: "gpt-5.4-mini",
         SOURCE_REGISTRY_JSON: sourceRegistryJson,
         MAX_CANDIDATES_PER_SOURCE: "8",
         MAX_CANDIDATES_PER_RUN: "24",
